@@ -49,6 +49,7 @@ var Lx;
         __extends(ViewGroup, _super);
         function ViewGroup(layoutParams) {
             var _this = _super.call(this) || this;
+            _this._flags = 0;
             _this.addEventListener(egret.Event.ADDED_TO_STAGE, _this._attachToWindow, _this);
             _this.addEventListener(egret.Event.REMOVED_FROM_STAGE, _this._detachFromWidnow, _this);
             _this.layoutParams = layoutParams;
@@ -79,6 +80,7 @@ var Lx;
                         t = this.y ? this.y : 0;
                         this.layout(l, t, this.getMeasuredWidth(), this.getMeasuredHeight());
                     }
+                    this._flags |= ViewGroup.FLAG_ATTACHED_TO_WINDOW;
                     return [2 /*return*/];
                 });
             });
@@ -88,6 +90,7 @@ var Lx;
                 return __generator(this, function (_a) {
                     this.removeEventListener(egret.Event.REMOVED_FROM_STAGE, this._detachFromWidnow, this);
                     this.onDetachFromWidnow();
+                    this._flags |= ~ViewGroup.FLAG_ATTACHED_TO_WINDOW;
                     return [2 /*return*/];
                 });
             });
@@ -139,6 +142,20 @@ var Lx;
         };
         ViewGroup.prototype.setLayoutParams = function (params) {
             this.layoutParams = params;
+        };
+        ViewGroup.prototype.addChild = function (child) {
+            var returnValue = _super.prototype.addChild.call(this, child);
+            if ((this._flags & ViewGroup.FLAG_ATTACHED_TO_WINDOW) == ViewGroup.FLAG_ATTACHED_TO_WINDOW) {
+                this.onChildAddedAfterAttach(child);
+            }
+            return returnValue;
+        };
+        ViewGroup.prototype.addChildAt = function (child, index) {
+            var returnValue = _super.prototype.addChildAt.call(this, child, index);
+            if ((this._flags & ViewGroup.FLAG_ATTACHED_TO_WINDOW) == ViewGroup.FLAG_ATTACHED_TO_WINDOW) {
+                this.onChildAddedAfterAttach(child);
+            }
+            return returnValue;
         };
         ViewGroup.getChildMeasureSpec = function (spec, padding, childDimension) {
             var specMode = Lx.MeasureSpec.getMode(spec);
@@ -201,6 +218,7 @@ var Lx;
             }
             return returnVlaue;
         };
+        ViewGroup.FLAG_ATTACHED_TO_WINDOW = 1;
         return ViewGroup;
     }(egret.DisplayObjectContainer));
     Lx.ViewGroup = ViewGroup;

@@ -78,20 +78,7 @@ var Lx;
             if (matchParentChildren.length > 0) {
                 for (var _i = 0, matchParentChildren_1 = matchParentChildren; _i < matchParentChildren_1.length; _i++) {
                     var child = matchParentChildren_1[_i];
-                    p = child.getLayoutParams();
-                    if (p.width == Lx.ViewGroupLayoutParams.MATCH_PARENT) {
-                        cWidthMeasureSpec = Lx.MeasureSpec.makeMeasureSpec(width - p.marginLeft - p.marginRight, Lx.MeasureSpec.EXACTLY);
-                    }
-                    else {
-                        cWidthMeasureSpec = Lx.ViewGroup.getChildMeasureSpec(widthMeasureSpec, p.marginLeft + p.marginRight, p.width);
-                    }
-                    if (p.height == Lx.ViewGroupLayoutParams.MATCH_PARENT) {
-                        cHeightMeasureSpec = Lx.MeasureSpec.makeMeasureSpec(height - p.marginTop - p.marginBottom, Lx.MeasureSpec.EXACTLY);
-                    }
-                    else {
-                        cHeightMeasureSpec = Lx.ViewGroup.getChildMeasureSpec(height, p.marginTop + p.marginBottom, p.height);
-                    }
-                    child.measure(cWidthMeasureSpec, cHeightMeasureSpec);
+                    this._measureChild(child, width, height, widthMeasureSpec, heightMeasureSpec);
                 }
             }
         };
@@ -99,52 +86,78 @@ var Lx;
             var width = r - l;
             var height = b - t;
             var c;
-            var p;
             var lc;
-            var childLeft;
-            var childTop;
             for (var i = 0; i < this.numChildren; i++) {
                 c = this.getChildAt(i);
                 if (c) {
                     lc = Lx.ViewGroup.asViewInterface(c);
                     if (lc) {
-                        p = lc.getLayoutParams();
-                        if (p instanceof FrameLayoutLayoutParams) {
-                            switch (p.layoutGravity & Lx.Gravity.HORIZONTAL_GRAVITY_MASK) {
-                                case Lx.Gravity.CENTER_HORIZONTAL:
-                                    childLeft = (this.width >> 1) - (lc.getMeasuredWidth() >> 1) + p.marginLeft - p.marginRight;
-                                    break;
-                                case Lx.Gravity.RIGHT:
-                                    childLeft = this.width - lc.getMeasuredWidth() - p.marginRight;
-                                    break;
-                                case Lx.Gravity.LEFT:
-                                default:
-                                    childLeft = 0 + p.marginLeft;
-                                    break;
-                            }
-                            switch (p.layoutGravity & Lx.Gravity.VERTICAL_GRAVITY_MASK) {
-                                case Lx.Gravity.CENTER_VERTICAL:
-                                    childTop = (this.height >> 1) - (lc.getMeasuredHeight() >> 1) + p.marginTop - p.marginBottom;
-                                    break;
-                                case Lx.Gravity.BOTTOM:
-                                    childTop = this.height - lc.getMeasuredHeight() - p.marginBottom;
-                                    break;
-                                case Lx.Gravity.TOP:
-                                default:
-                                    childTop = 0 + p.marginTop;
-                                    break;
-                            }
-                            lc.layout(childLeft, childTop, childLeft + lc.getMeasuredWidth(), childTop + lc.getMeasuredHeight());
-                        }
-                        else {
-                            lc.layout(0, 0, lc.getMeasuredWidth(), lc.getMeasuredHeight());
-                        }
+                        this._layoutChild(lc, l, t, r, b);
                     }
                     else {
                         c.x = 0 + c.anchorOffsetX;
                         c.y = 0 + c.anchorOffsetY;
                     }
                 }
+            }
+        };
+        FrameLayout.prototype._layoutChild = function (child, l, t, r, b) {
+            var childLeft;
+            var childTop;
+            var p = child.getLayoutParams();
+            if (p instanceof FrameLayoutLayoutParams) {
+                switch (p.layoutGravity & Lx.Gravity.HORIZONTAL_GRAVITY_MASK) {
+                    case Lx.Gravity.CENTER_HORIZONTAL:
+                        childLeft = (this.width >> 1) - (child.getMeasuredWidth() >> 1) + p.marginLeft - p.marginRight;
+                        break;
+                    case Lx.Gravity.RIGHT:
+                        childLeft = this.width - child.getMeasuredWidth() - p.marginRight;
+                        break;
+                    case Lx.Gravity.LEFT:
+                    default:
+                        childLeft = 0 + p.marginLeft;
+                        break;
+                }
+                switch (p.layoutGravity & Lx.Gravity.VERTICAL_GRAVITY_MASK) {
+                    case Lx.Gravity.CENTER_VERTICAL:
+                        childTop = (this.height >> 1) - (child.getMeasuredHeight() >> 1) + p.marginTop - p.marginBottom;
+                        break;
+                    case Lx.Gravity.BOTTOM:
+                        childTop = this.height - child.getMeasuredHeight() - p.marginBottom;
+                        break;
+                    case Lx.Gravity.TOP:
+                    default:
+                        childTop = 0 + p.marginTop;
+                        break;
+                }
+                child.layout(childLeft, childTop, childLeft + child.getMeasuredWidth(), childTop + child.getMeasuredHeight());
+            }
+            else {
+                child.layout(0, 0, child.getMeasuredWidth(), child.getMeasuredHeight());
+            }
+        };
+        FrameLayout.prototype._measureChild = function (child, parentWidth, parentHeight, parentWidthMeasureSpec, parentHeightMeasureSpec) {
+            var cWidthMeasureSpec;
+            var cHeightMeasureSpec;
+            var p = child.getLayoutParams();
+            if (p.width == Lx.ViewGroupLayoutParams.MATCH_PARENT) {
+                cWidthMeasureSpec = Lx.MeasureSpec.makeMeasureSpec(parentWidth - p.marginLeft - p.marginRight, Lx.MeasureSpec.EXACTLY);
+            }
+            else {
+                cWidthMeasureSpec = Lx.ViewGroup.getChildMeasureSpec(parentWidthMeasureSpec, p.marginLeft + p.marginRight, p.width);
+            }
+            if (p.height == Lx.ViewGroupLayoutParams.MATCH_PARENT) {
+                cHeightMeasureSpec = Lx.MeasureSpec.makeMeasureSpec(parentHeight - p.marginTop - p.marginBottom, Lx.MeasureSpec.EXACTLY);
+            }
+            else {
+                cHeightMeasureSpec = Lx.ViewGroup.getChildMeasureSpec(parentHeightMeasureSpec, p.marginTop + p.marginBottom, p.height);
+            }
+            child.measure(cWidthMeasureSpec, cHeightMeasureSpec);
+        };
+        FrameLayout.prototype.onChildAddedAfterAttach = function (child) {
+            var c = Lx.ViewGroup.asViewInterface(child);
+            if (c) {
+                this._measureChild(c, this.width, this.height, this._oldWidthMeasureSpec, this._oldHeightMeasureSpec);
             }
         };
         return FrameLayout;

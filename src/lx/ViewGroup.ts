@@ -1,11 +1,13 @@
 namespace Lx {
     export abstract class ViewGroup extends egret.DisplayObjectContainer implements ViewInterface {
 
-        private _measuredWidth: number
-        private _measuredHeight: number
-        private _oldWidthMeasureSpec: number
-        private _oldHeightMeasureSpec: number
-        private _flags: number
+        private static readonly FLAG_ATTACHED_TO_WINDOW = 1;
+
+        protected _measuredWidth: number
+        protected _measuredHeight: number
+        protected _oldWidthMeasureSpec: number
+        protected _oldHeightMeasureSpec: number
+        protected _flags: number = 0
         protected layoutParams: LayoutParams
 
         constructor(layoutParams?: LayoutParams) {
@@ -36,11 +38,13 @@ namespace Lx {
                 let t = this.y ? this.y : 0
                 this.layout(l, t, this.getMeasuredWidth(), this.getMeasuredHeight())
             }
+            this._flags |= ViewGroup.FLAG_ATTACHED_TO_WINDOW
         }
 
         private async _detachFromWidnow(ev: egret.Event) {
             this.removeEventListener(egret.Event.REMOVED_FROM_STAGE, this._detachFromWidnow, this)
             this.onDetachFromWidnow()
+            this._flags |= ~ViewGroup.FLAG_ATTACHED_TO_WINDOW
         }
 
         protected onAttachToWindow() {
@@ -82,6 +86,8 @@ namespace Lx {
 
         public abstract onLayout(l: number, t: number, r: number, b: number)
 
+        protected abstract onChildAddedAfterAttach(child: egret.DisplayObject)
+
         protected setMeasuredDimension(width: number, height: number) {
             this._measuredWidth = width
             this._measuredHeight = height
@@ -105,6 +111,22 @@ namespace Lx {
 
         public setLayoutParams(params: LayoutParams) {
             this.layoutParams = params
+        }
+
+        public addChild(child: egret.DisplayObject): egret.DisplayObject {
+            let returnValue = super.addChild(child)
+            if ((this._flags & ViewGroup.FLAG_ATTACHED_TO_WINDOW) == ViewGroup.FLAG_ATTACHED_TO_WINDOW) {
+                this.onChildAddedAfterAttach(child)
+            }
+            return returnValue
+        }
+
+        public addChildAt(child: egret.DisplayObject, index: number): egret.DisplayObject {
+            let returnValue = super.addChildAt(child, index)
+            if ((this._flags & ViewGroup.FLAG_ATTACHED_TO_WINDOW) == ViewGroup.FLAG_ATTACHED_TO_WINDOW) {
+                this.onChildAddedAfterAttach(child)
+            }
+            return returnValue
         }
 
         public static getChildMeasureSpec(spec: number, padding: number, childDimension: number) {
