@@ -27,10 +27,43 @@ namespace Lx {
                             ViewGroup.getChildMeasureSpec(widthMeasureSpec, p.marginLeft + p.marginRight, p.width),
                             ViewGroup.getChildMeasureSpec(heightMeasureSpec, p.marginTop + p.marginBottom, p.height)
                         )
-                        if (lc.getMeasuredWidth() > wantWidth)
-                            wantWidth = lc.getMeasuredWidth()
-                        if (lc.getMeasuredHeight() > wantHeight)
-                            wantHeight = lc.getMeasuredHeight()
+                        if (p instanceof FrameLayoutLayoutParams) {
+                            switch (p.layoutGravity & Gravity.HORIZONTAL_GRAVITY_MASK) {
+                                case Gravity.CENTER_HORIZONTAL:
+                                    if (lc.getMeasuredWidth() + p.marginLeft + p.marginRight > wantWidth)
+                                        wantWidth = lc.getMeasuredWidth() + p.marginLeft + p.marginRight
+                                    break
+                                case Gravity.RIGHT:
+                                    if (lc.getMeasuredWidth() + p.marginRight > wantWidth)
+                                        wantWidth = lc.getMeasuredWidth() + p.marginRight
+                                    break
+                                case Gravity.LEFT:
+                                default:
+                                    if (lc.getMeasuredWidth() + p.marginLeft > wantWidth)
+                                        wantWidth = lc.getMeasuredWidth() + p.marginLeft
+                                    break
+                            }
+                            switch (p.layoutGravity & Gravity.VERTICAL_GRAVITY_MASK) {
+                                case Gravity.CENTER_VERTICAL:
+                                    if (lc.getMeasuredHeight() + p.marginTop + p.marginBottom > wantHeight)
+                                        wantHeight = lc.getMeasuredHeight() + p.marginTop + p.marginBottom
+                                    break
+                                case Gravity.BOTTOM:
+                                    if (lc.getMeasuredHeight() + p.marginTop > wantHeight)
+                                        wantHeight = lc.getMeasuredHeight() + p.marginTop
+                                    break
+                                case Gravity.TOP:
+                                default:
+                                    if (lc.getMeasuredHeight() + p.marginBottom > wantHeight)
+                                        wantHeight = lc.getMeasuredHeight() + p.marginBottom
+                                    break
+                            }
+                        } else {
+                            if (lc.getMeasuredWidth() > wantWidth)
+                                wantWidth = lc.getMeasuredWidth()
+                            if (lc.getMeasuredHeight() > wantHeight)
+                                wantHeight = lc.getMeasuredHeight()
+                        }
                         if (measureMatchParentChildren) {
                             if (p.width == ViewGroupLayoutParams.MATCH_PARENT || p.height == ViewGroupLayoutParams.MATCH_PARENT) {
                                 matchParentChildren.push(lc)
@@ -150,6 +183,9 @@ namespace Lx {
                 this._measureChild(c, this.width, this.height, this._oldWidthMeasureSpec, this._oldHeightMeasureSpec)
             }
         }
+
+        protected onChildRemovedAfterAttach(child: egret.DisplayObject) { }
+        protected onChildrenRemovedAfterAttach() { }
     }
 
     export class FrameLayoutLayoutParams extends ViewGroupLayoutParams {

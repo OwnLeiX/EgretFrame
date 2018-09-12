@@ -102,53 +102,40 @@ class Main extends eui.UILayer {
         let shape = new egret.Shape();
         shape.width = 850
         shape.height = 1136
-        shape.graphics.beginFill(0xFFFFFF)
+        shape.graphics.beginFill(0)
         shape.graphics.drawRect(0, 0, 850, 1136)
         shape.graphics.endFill()
         this.addChild(shape)
 
-        let fl = new Lx.FrameLayout(new Lx.LayoutParams(Lx.ViewGroupLayoutParams.MATCH_PARENT, Lx.ViewGroupLayoutParams.MATCH_PARENT))
+        let fl = new Lx.FrameLayout(new Lx.LayoutParams(Lx.ViewGroupLayoutParams.MATCH_PARENT, Lx.ViewGroupLayoutParams.WRAP_CONTENT))
 
         let leftTopP = new Lx.FrameLayoutLayoutParams(Lx.ViewGroupLayoutParams.WRAP_CONTENT, Lx.ViewGroupLayoutParams.WRAP_CONTENT)
         leftTopP.layoutGravity = Lx.Gravity.LEFT | Lx.Gravity.TOP
         leftTopP.marginLeft = 20
+        leftTopP.marginBottom = 20
         let leftTopT = new Lx.TextView(leftTopP)
         leftTopT.text = "LeftTop"
-        leftTopT.size = 30
-        leftTopT.bold = true
-        leftTopT.textColor = 0x000000
 
-
-        let centerP = new Lx.FrameLayoutLayoutParams(Lx.ViewGroupLayoutParams.WRAP_CONTENT, Lx.ViewGroupLayoutParams.WRAP_CONTENT)
-        centerP.layoutGravity = Lx.Gravity.CENTER
-        let centerT = new Lx.TextView(centerP)
-        centerT.text = "center"
-        centerT.size = 30
-        centerT.bold = true
-        centerT.textColor = 0x000000
-
+        // let centerP = new Lx.FrameLayoutLayoutParams(Lx.ViewGroupLayoutParams.WRAP_CONTENT, Lx.ViewGroupLayoutParams.WRAP_CONTENT)
+        // centerP.layoutGravity = Lx.Gravity.CENTER
+        // let centerT = new Lx.TextView(centerP)
+        // centerT.text = "center"
 
         let rithtBottomP = new Lx.FrameLayoutLayoutParams(Lx.ViewGroupLayoutParams.WRAP_CONTENT, Lx.ViewGroupLayoutParams.WRAP_CONTENT)
         rithtBottomP.layoutGravity = Lx.Gravity.RIGHT | Lx.Gravity.BOTTOM
         let rithtBottomT = new Lx.TextView(rithtBottomP)
         rithtBottomT.text = "rithtBottom"
-        rithtBottomT.size = 30
-        rithtBottomT.bold = true
-        rithtBottomT.textColor = 0x000000
 
-        let macthPP = new Lx.FrameLayoutLayoutParams(Lx.ViewGroupLayoutParams.MATCH_PARENT, Lx.ViewGroupLayoutParams.MATCH_PARENT)
-        let macthPT = new Lx.TextView(macthPP)
-        macthPT.text = "match"
-        macthPT.size = 30
-        macthPT.bold = true
-        macthPT.textColor = 0x000000
-        macthPT.textAlign = egret.HorizontalAlign.CENTER
-        macthPT.verticalAlign = egret.VerticalAlign.BOTTOM
+        // let macthPP = new Lx.FrameLayoutLayoutParams(Lx.ViewGroupLayoutParams.MATCH_PARENT, Lx.ViewGroupLayoutParams.MATCH_PARENT)
+        // let macthPT = new Lx.TextView(macthPP)
+        // macthPT.text = "match"
+        // macthPT.textAlign = egret.HorizontalAlign.CENTER
+        // macthPT.verticalAlign = egret.VerticalAlign.BOTTOM
 
         fl.addChild(leftTopT)
-        fl.addChild(centerT)
+        // fl.addChild(centerT)
         fl.addChild(rithtBottomT)
-        fl.addChild(macthPT)
+        // fl.addChild(macthPT)
 
         this.addChild(fl)
     }

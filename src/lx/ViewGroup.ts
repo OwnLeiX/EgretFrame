@@ -25,12 +25,39 @@ namespace Lx {
             } else {
                 //It is not in Lx.Views system.
                 if (this.layoutParams) {
-                    let wMode = this.layoutParams.width == ViewGroupLayoutParams.WRAP_CONTENT ? MeasureSpec.AT_MOST : MeasureSpec.EXACTLY
-                    let wSize = this.layoutParams.width == ViewGroupLayoutParams.MATCH_PARENT ? this.parent.width : Math.max(0, this.layoutParams.width)
-
-                    let hMode = this.layoutParams.height == ViewGroupLayoutParams.WRAP_CONTENT ? MeasureSpec.AT_MOST : MeasureSpec.EXACTLY
-                    let hSize = this.layoutParams.height == ViewGroupLayoutParams.MATCH_PARENT ? this.parent.height : Math.max(0, this.layoutParams.height)
-                    this.measure(ViewGroup.getChildMeasureSpec(wMode, 0, wSize), ViewGroup.getChildMeasureSpec(hMode, 0, hSize))
+                    let wMode
+                    let wSize
+                    switch (this.layoutParams.width) {
+                        case ViewGroupLayoutParams.WRAP_CONTENT:
+                            wMode = MeasureSpec.AT_MOST
+                            wSize = this.parent.width
+                            break
+                        case ViewGroupLayoutParams.MATCH_PARENT:
+                            wMode = MeasureSpec.EXACTLY
+                            wSize = this.parent.width
+                            break
+                        default:
+                            wMode = MeasureSpec.EXACTLY
+                            wSize = this.layoutParams.width
+                            break
+                    }
+                    let hMode
+                    let hSize
+                    switch (this.layoutParams.height) {
+                        case ViewGroupLayoutParams.WRAP_CONTENT:
+                            hMode = MeasureSpec.AT_MOST
+                            hSize = this.parent.height
+                            break
+                        case ViewGroupLayoutParams.MATCH_PARENT:
+                            hMode = MeasureSpec.EXACTLY
+                            hSize = this.parent.height
+                            break
+                        default:
+                            hMode = MeasureSpec.EXACTLY
+                            hSize = this.layoutParams.height
+                            break
+                    }
+                    this.measure(MeasureSpec.makeMeasureSpec(wSize, wMode), MeasureSpec.makeMeasureSpec(hSize, hMode))
                 } else {
                     this.measure(MeasureSpec.makeMeasureSpec(this.width ? this.width : 0, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(this.height ? this.height : 0, MeasureSpec.EXACTLY))
                 }
@@ -87,6 +114,8 @@ namespace Lx {
         public abstract onLayout(l: number, t: number, r: number, b: number)
 
         protected abstract onChildAddedAfterAttach(child: egret.DisplayObject)
+        protected abstract onChildRemovedAfterAttach(child: egret.DisplayObject)
+        protected abstract onChildrenRemovedAfterAttach()
 
         protected setMeasuredDimension(width: number, height: number) {
             this._measuredWidth = width
@@ -115,7 +144,7 @@ namespace Lx {
 
         public addChild(child: egret.DisplayObject): egret.DisplayObject {
             let returnValue = super.addChild(child)
-            if ((this._flags & ViewGroup.FLAG_ATTACHED_TO_WINDOW) == ViewGroup.FLAG_ATTACHED_TO_WINDOW) {
+            if ((this._flags & ViewGroup.FLAG_ATTACHED_TO_WINDOW) == ViewGroup.FLAG_ATTACHED_TO_WINDOW && returnValue) {
                 this.onChildAddedAfterAttach(child)
             }
             return returnValue
@@ -123,8 +152,32 @@ namespace Lx {
 
         public addChildAt(child: egret.DisplayObject, index: number): egret.DisplayObject {
             let returnValue = super.addChildAt(child, index)
-            if ((this._flags & ViewGroup.FLAG_ATTACHED_TO_WINDOW) == ViewGroup.FLAG_ATTACHED_TO_WINDOW) {
+            if ((this._flags & ViewGroup.FLAG_ATTACHED_TO_WINDOW) == ViewGroup.FLAG_ATTACHED_TO_WINDOW && returnValue) {
                 this.onChildAddedAfterAttach(child)
+            }
+            return returnValue
+        }
+
+        public removeChild(child: egret.DisplayObject): egret.DisplayObject {
+            let returnValue = super.removeChild(child)
+            if ((this._flags & ViewGroup.FLAG_ATTACHED_TO_WINDOW) == ViewGroup.FLAG_ATTACHED_TO_WINDOW && returnValue) {
+                this.onChildRemovedAfterAttach(returnValue)
+            }
+            return returnValue
+        }
+
+        public removeChildAt(index: number): egret.DisplayObject {
+            let returnValue = super.removeChildAt(index)
+            if ((this._flags & ViewGroup.FLAG_ATTACHED_TO_WINDOW) == ViewGroup.FLAG_ATTACHED_TO_WINDOW && returnValue) {
+                this.onChildRemovedAfterAttach(returnValue)
+            }
+            return returnValue
+        }
+
+        public removeCremoveChildrenhildren() {
+            let returnValue = super.removeChildren()
+            if ((this._flags & ViewGroup.FLAG_ATTACHED_TO_WINDOW) == ViewGroup.FLAG_ATTACHED_TO_WINDOW && returnValue) {
+                this.onChildrenRemovedAfterAttach()
             }
             return returnValue
         }
